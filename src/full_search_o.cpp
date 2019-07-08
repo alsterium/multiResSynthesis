@@ -1,6 +1,6 @@
 #include "full_search_o.h"
 
-std::pair<cv::Vec3b, int> full_search_o_select(cv::Mat ref_src, cv::Mat ref_dst, cv::Vec2i coord, F_Property prop)
+std::pair<cv::Vec3b, int> full_search_o_select(cv::Mat &ref_src, cv::Mat &ref_dst, cv::Point2i coord, F_Property prop)
 {
 	int nbr = prop.nbr;
 	int src_cyc = prop.cyc;
@@ -31,7 +31,7 @@ std::pair<cv::Vec3b, int> full_search_o_select(cv::Mat ref_src, cv::Mat ref_dst,
 	}
 
 	// 近隣画素中の画素数
-	int pxn = ((2 * nbr + 1) * (2 * nbr + 1)) / 2;
+	int pxn = ((2 * nbr + 1) * (2 * nbr + 1));
 	
 	// 最大SSD値
 	int ssd_max = 3 * 255 * 255 * pxn;
@@ -40,8 +40,8 @@ std::pair<cv::Vec3b, int> full_search_o_select(cv::Mat ref_src, cv::Mat ref_dst,
 	int ssd_min = ssd_max;
 
 	// 入力テクスチャの選択画素の初期化
-	int d_x_s = -1;
-	int d_y_s = -1;
+	int s_x_s = -1;
+	int s_y_s = -1;
 
 	// 入力テクスチャ上の探索
 	for (int s_y = src_y_min; s_y < src_y_max; s_y++) {
@@ -54,7 +54,7 @@ std::pair<cv::Vec3b, int> full_search_o_select(cv::Mat ref_src, cv::Mat ref_dst,
 				for (int nx = (-nbr); nx <= nbr; nx++) {
 					// 計算
 					for (int c = 0; c < 3; c++) {
-						s = ref_dst.at<cv::Vec3b>((coord.val[1] + ny + dst_y) % dst_y, (coord.val[0] + nx + dst_x) % dst_x)[c] - ref_src.at<cv::Vec3b>((s_y + ny + src_y) % src_y,(s_x + ny + src_x)%src_x)[c];
+						s = ref_dst.at<cv::Vec3b>((coord.y + ny + dst_y) % dst_y, (coord.x + nx + dst_x) % dst_x)[c] - ref_src.at<cv::Vec3b>((s_y + ny + src_y) % src_y,(s_x + ny + src_x)%src_x)[c];
 						ssd += (s * s);
 					}
 				}
@@ -62,8 +62,8 @@ std::pair<cv::Vec3b, int> full_search_o_select(cv::Mat ref_src, cv::Mat ref_dst,
 			// 最小SSD値と入力テクスチャの選択画素の更新
 			if (ssd_min > ssd) {
 				ssd_min = ssd;
-				d_x_s = s_x;
-				d_y_s = s_y;
+				s_x_s = s_x;
+				s_y_s = s_y;
 			}
 
 		}//s_x
@@ -75,13 +75,13 @@ std::pair<cv::Vec3b, int> full_search_o_select(cv::Mat ref_src, cv::Mat ref_dst,
 	}
 	else {//入力テクスチャの画素が選択されている
 		return {
-			cv::Vec3b(ref_src.at<cv::Vec3b>(d_y_s, d_x_s)[0], ref_src.at<cv::Vec3b>(d_y_s, d_x_s)[1], ref_src.at<cv::Vec3b>(d_y_s, d_x_s)[2]),
-			ssd_min
+			cv::Vec3b(ref_src.at<cv::Vec3b>(s_y_s, s_x_s)[0], ref_src.at<cv::Vec3b>(s_y_s, s_x_s)[1], ref_src.at<cv::Vec3b>(s_y_s, s_x_s)[2]),
+			ssd_min/pxn
 		};
 	}
 }
 
-std::pair<cv::Vec3b, int> full_search_l_select(cv::Mat ref_src, cv::Mat ref_dst, cv::Vec2i coord, F_Property prop)
+std::pair<cv::Vec3b, int> full_search_l_select(cv::Mat &ref_src, cv::Mat &ref_dst, cv::Point2i coord, F_Property prop)
 {
 	int nbr = prop.nbr;
 	int src_cyc = prop.cyc;
@@ -91,6 +91,9 @@ std::pair<cv::Vec3b, int> full_search_l_select(cv::Mat ref_src, cv::Mat ref_dst,
 
 	int dst_x = ref_dst.cols;
 	int dst_y = ref_dst.rows;
+
+	int d_x = coord.x;
+	int d_y = coord.y;
 
 	//入力テクスチャの探索範囲
 	int src_x_min, src_x_max;
@@ -117,12 +120,15 @@ std::pair<cv::Vec3b, int> full_search_l_select(cv::Mat ref_src, cv::Mat ref_dst,
 	// 最大SSD値
 	int ssd_max = 3 * 255 * 255 * pxn;
 
+
+	//-----出力テクスチャのループ-----//
+
 	// 最小SSD値の初期化
 	int ssd_min = ssd_max;
 
 	// 入力テクスチャの選択画素の初期化
-	int d_x_s = -1;
-	int d_y_s = -1;
+	int s_x_s = -1;
+	int s_y_s = -1;
 
 	// 入力テクスチャ上の探索
 	for (int s_y = src_y_min; s_y < src_y_max; s_y++) {
@@ -136,7 +142,7 @@ std::pair<cv::Vec3b, int> full_search_l_select(cv::Mat ref_src, cv::Mat ref_dst,
 					if ((ny == 0) && (nx == 0))break;
 					// 計算
 					for (int c = 0; c < 3; c++) {
-						s = ref_dst.at<cv::Vec3b>((coord.val[1] + ny + dst_y) % dst_y, (coord.val[0] + nx + dst_x) % dst_x)[c] - ref_src.at<cv::Vec3b>((s_y + ny + src_y) % src_y, (s_x + ny + src_x) % src_x)[c];
+						s = ref_dst.at <cv::Vec3b>((d_y + ny + dst_y) % dst_y, (d_x + nx + dst_x) % dst_x)[c] - ref_src.at<cv::Vec3b>((s_y + ny + src_y) % src_y, (s_x + nx + src_x) % src_x)[c];
 						ssd += (s * s);
 					}
 				}
@@ -144,8 +150,8 @@ std::pair<cv::Vec3b, int> full_search_l_select(cv::Mat ref_src, cv::Mat ref_dst,
 			// 最小SSD値と入力テクスチャの選択画素の更新
 			if (ssd_min > ssd) {
 				ssd_min = ssd;
-				d_x_s = s_x;
-				d_y_s = s_y;
+				s_x_s = s_x;
+				s_y_s = s_y;
 			}
 
 		}//s_x
@@ -157,20 +163,23 @@ std::pair<cv::Vec3b, int> full_search_l_select(cv::Mat ref_src, cv::Mat ref_dst,
 	}
 	else {//入力テクスチャの画素が選択されている
 		return {
-			cv::Vec3b(ref_src.at<cv::Vec3b>(d_y_s, d_x_s)[0], ref_src.at<cv::Vec3b>(d_y_s, d_x_s)[1], ref_src.at<cv::Vec3b>(d_y_s, d_x_s)[2]),
-			ssd_min
+			cv::Vec3b(ref_src.at<cv::Vec3b>(s_y_s, s_x_s)[0], ref_src.at<cv::Vec3b>(s_y_s, s_x_s)[1], ref_src.at<cv::Vec3b>(s_y_s, s_x_s)[2]),
+			ssd_min/pxn
 		};
 	}
 }
 
-void synthesis_multi(std::vector<cv::Mat> src_image_vector, std::vector<cv::Mat> dst_image_vector, F_Property prop)
+void synthesis_multi(std::vector<cv::Mat> &src_image_vector, std::vector<cv::Mat> &dst_image_vector, F_Property prop)
 {
 	// 最低解像度の画像合成
 	std::cout << "--->lowest resolution image synthesis is running...\n";
 
-	for (int d_y = 0; d_y < dst_image_vector[dst_image_vector.size() - 1].rows; d_y++) {
-		for (int d_x = 0; d_x < dst_image_vector[dst_image_vector.size() - 1].cols; d_x++) {
-			auto [color, ssd_min] = full_search_l_select(src_image_vector[(int)(src_image_vector.size() - 1)], dst_image_vector[(int)(dst_image_vector.size() - 1)], cv::Vec2i(d_x, d_y), prop);
+	int low_level_dst_x = dst_image_vector[dst_image_vector.size() - 1].cols;
+	int low_level_dst_y = dst_image_vector[dst_image_vector.size() - 1].rows;
+
+	for (int d_y = 0; d_y < low_level_dst_y; d_y++) {
+		for (int d_x = 0; d_x < low_level_dst_x; d_x++) {
+			auto [color, ssd_min] = full_search_l_select(src_image_vector[(int)(src_image_vector.size() - 1)], dst_image_vector[(int)(dst_image_vector.size() - 1)], cv::Point2i(d_x, d_y), prop);
 			dst_image_vector[dst_image_vector.size() - 1].at<cv::Vec3b>(d_y, d_x) = color;
 		}
 	}
@@ -185,13 +194,13 @@ void synthesis_multi(std::vector<cv::Mat> src_image_vector, std::vector<cv::Mat>
 		//出力テクスチャのループ
 		for (int d_y = 0; d_y < dst_y; d_y++) {
 			for (int d_x = 0; d_x < dst_x; d_x++) {
-				auto [o_color, o_ssd_min] = full_search_o_select(src_image_vector[(i + 1)], dst_image_vector[(i + 1)], cv::Vec2i((d_x / 2), (d_y / 2)), prop);
-				auto [l_color, l_ssd_min] = full_search_l_select(src_image_vector[i], dst_image_vector[i], cv::Vec2i(d_x, d_y), prop);
+				auto [o_color, o_ssd_min] = full_search_o_select(src_image_vector[(i + 1)], dst_image_vector[(i + 1)], cv::Point2i((d_x / 2), (d_y / 2)), prop);
+				auto [l_color, l_ssd_min] = full_search_l_select(src_image_vector[i], dst_image_vector[i], cv::Point2i(d_x, d_y), prop);
 				if (o_ssd_min > l_ssd_min)
 					dst_image_vector[i].at<cv::Vec3b>(d_y, d_x) = l_color;
 				else
 					dst_image_vector[i].at<cv::Vec3b>(d_y, d_x) = o_color;
-				//std::cout << "end in ( " << d_y << "," << d_x << " )...\n";
+				std::cout << "end in ( " << d_y << "," << d_x << " )...\n";
 			}
 		}
 	}
