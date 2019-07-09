@@ -12,9 +12,9 @@ using namespace std;
 
 constexpr float scale = 0;
 
-constexpr int MultiResLevel = 4;
+constexpr int MultiResLevel = 2;
 // *square*
-constexpr int DstRes = 150;
+constexpr int DstRes = 300;
 
 int main() {
 	cout << "---->main()\n";

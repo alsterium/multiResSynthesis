@@ -200,7 +200,7 @@ void synthesis_multi(std::vector<cv::Mat> &src_image_vector, std::vector<cv::Mat
 					dst_image_vector[i].at<cv::Vec3b>(d_y, d_x) = l_color;
 				else
 					dst_image_vector[i].at<cv::Vec3b>(d_y, d_x) = o_color;
-				std::cout << "end in ( " << d_y << "," << d_x << " )...\n";
+				//std::cout << "end in ( " << d_y << "," << d_x << " )...\n";
 			}
 		}
 	}
