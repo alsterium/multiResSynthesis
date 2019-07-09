@@ -12,16 +12,16 @@ using namespace std;
 
 constexpr float scale = 0;
 
-constexpr int MultiResLevel = 3;
+constexpr int MultiResLevel = 4;
 // *square*
-constexpr int DstRes = 150;
+constexpr int DstRes = 200;
 
 int main() {
 	cout << "---->main()\n";
 	cout << "";
 	cv::Mat src_image;
 	src_image = cv::imread("./texture_o_icon.jpg");
-	vector<cv::Mat> src_image_vector;
+	vector<cv::Mat> src_img_vector;
 	vector<cv::Mat> dst_img_vector;
 
 	//出力先のMattを生成
@@ -36,12 +36,12 @@ int main() {
 
 	//解像度を1/2した画像を生成
 	cout << "-->Generate harf-size image.";
-	src_image_vector.push_back(src_image);
+	src_img_vector.push_back(src_image);
 	try {
 		tmp = src_image;
 		for (int i = 1; i < MultiResLevel; i++) {
 			cv::pyrDown(tmp, tmp);
-			src_image_vector.push_back(tmp);
+			src_img_vector.push_back(tmp);
 		}
 	}
 	catch(cv::Exception& e){
@@ -56,38 +56,35 @@ int main() {
 
 	//最低解像度の画像合成
 	//cout << "--->lowest resolution image synthesis is running...\n";
-	F_Property prop(7);
-	//fullserch_L(src_image_vector[(int)(src_image_vector.size() - 1)], dst_img_vector[(int)(src_image_vector.size() - 1)], prop);
+	F_Property prop(2);
+	//fullserch_L(src_img_vector[(int)(src_img_vector.size() - 1)], dst_img_vector[(int)(dst_img_vector.size() - 1)], prop);
 
 	//各解像度ごとに一つ下のレベルの解像度を参照して画像合成
 	cout << "--->multi resolution synthesis is begin!!\n";
-	synthesis_multi(src_image_vector, dst_img_vector, prop);
+	synthesis_multi(src_img_vector, dst_img_vector, prop);
 
 	//合成結果を表示
 	
 	cout << "<---end synthesis process.\n";
-	for (int i = 0; i < src_image_vector.size(); i++) {
+	/*for (int i = 0; i < src_img_vector.size(); i++) {
 		cv::String windowName = "src_image";
 		try { 
-			cv::imshow(windowName + to_string(i), src_image_vector[i]);
+			cv::imshow(windowName + to_string(i), src_img_vector[i]);
 		}
 		catch (cv::Exception& e) {
 			cerr << e.what() << endl;
 		}
-	}
+	}*/
 
-	int i = 0;
-	for (auto &e : dst_img_vector) {
+	for (int i = 0; i < dst_img_vector.size(); i++) {
 		cv::String windowName = "result";
 		try {
-			cv::imshow(windowName + to_string(i), e);
+			cv::imshow(windowName + to_string(i), dst_img_vector[i]);
 		}
 		catch(cv::Exception& e){
 			cerr << e.what() << endl;
 			exit(1);
 		}
-		
-		i++;
 	}
 
 	cout << "<----end main()\n";

@@ -1,7 +1,7 @@
 #include "full_serch_l.h"
 
 void fullserch_L(cv::Mat src, cv::Mat dst, F_Property prop) {
-	//•Ï”‚Ì‰Šú‰»
+	//å¤‰æ•°ã®åˆæœŸåŒ–
 	int nbr = prop.nbr;
 	int in_cyc = prop.cyc;
 
@@ -11,18 +11,18 @@ void fullserch_L(cv::Mat src, cv::Mat dst, F_Property prop) {
 	int out_x = dst.cols;
 	int out_y = dst.rows;
 
-	//“ü—ÍƒeƒNƒXƒ`ƒƒ‚Ì’Tõ”ÍˆÍ
+	//å…¥åŠ›ãƒ†ã‚¯ã‚¹ãƒãƒ£ã®æ¢ç´¢ç¯„å›²
 	int in_x_min, in_x_max;
 	int in_y_min, in_y_max;
 
-	//ŠÂó‚Å‚È‚¢
-	if (in_cyc == 0) { // ŠÂó‚Å‚È‚¢
+	//ç’°çŠ¶ã§ãªã„
+	if (in_cyc == 0) { // ç’°çŠ¶ã§ãªã„
 		in_x_min = nbr;
 		in_x_max = in_x - nbr;
 		in_y_min = nbr;
 		in_y_max = in_y;
 	}
-	else {              // ŠÂó‚Å‚ ‚é
+	else {              // ç’°çŠ¶ã§ã‚ã‚‹
 		in_x_min = 0;
 		in_x_max = in_x;
 		in_y_min = 0;
@@ -31,40 +31,40 @@ void fullserch_L(cv::Mat src, cv::Mat dst, F_Property prop) {
 
 	/*=====================================
 
-			o—ÍƒeƒNƒXƒ`ƒƒ‚Ì‡¬
+			å‡ºåŠ›ãƒ†ã‚¯ã‚¹ãƒãƒ£ã®åˆæˆ
 
 	======================================*/
 
-	// ‹ß—×‰æ‘fŒQ’†‚Ì‰æ‘f”
+	// è¿‘éš£ç”»ç´ ç¾¤ä¸­ã®ç”»ç´ æ•°
 	int pxn = ((2 * nbr + 1) * (2 * nbr + 1)) / 2;
 
-	// Å‘å SSD (sum of squared differences) ’l
+	// æœ€å¤§ SSD (sum of squared differences) å€¤
 	int ssd_max = 3 * 255 * 255 * pxn;
 
-	// o—ÍƒeƒNƒXƒ`ƒƒ‚Ì‰æ‘f‚Ìƒ‹[ƒv
+	// å‡ºåŠ›ãƒ†ã‚¯ã‚¹ãƒãƒ£ã®ç”»ç´ ã®ãƒ«ãƒ¼ãƒ—
 	for (int oy = 0; oy < out_y; oy++) {
 		for (int ox = 0; ox < out_x; ox++) {
 
-			// Å¬ SSD ’l‚Ì‰Šú‰»
+			// æœ€å° SSD å€¤ã®åˆæœŸåŒ–
 			int ssd_min = ssd_max;
 
-			// “ü—ÍƒeƒNƒXƒ`ƒƒ‚Ì‘I‘ğ‰æ‘f‚Ì‰Šú‰»
+			// å…¥åŠ›ãƒ†ã‚¯ã‚¹ãƒãƒ£ã®é¸æŠç”»ç´ ã®åˆæœŸåŒ–
 			int ix_s = -1;
 			int iy_s = -1;
 
-			// “ü—ÍƒeƒNƒXƒ`ƒƒã‚Ì’Tõ
+			// å…¥åŠ›ãƒ†ã‚¯ã‚¹ãƒãƒ£ä¸Šã®æ¢ç´¢
 			for (int iy = in_y_min; iy < in_y_max; iy++) {
 				for (int ix = in_x_min; ix < in_x_max; ix++) {
 
-					// ‹ß—×‰æ‘fŒQ‚Ì SSD ’l‚ÌŒvZ
+					// è¿‘éš£ç”»ç´ ç¾¤ã® SSD å€¤ã®è¨ˆç®—
 					int s;
 					int ssd = 0;
 					for (int ny = (-nbr); ny <= 0; ny++) {
 						for (int nx = (-nbr); nx <= nbr; nx++) {
-							// ‹ß—×‰æ‘fŒQ‚Ì’†S‚É—ˆ‚½‚çŒvZI—¹
+							// è¿‘éš£ç”»ç´ ç¾¤ã®ä¸­å¿ƒã«æ¥ãŸã‚‰è¨ˆç®—çµ‚äº†
 							if ((ny == 0) && (nx == 0))break;
 
-							// ŒvZ
+							// è¨ˆç®—
 							for (int c = 0; c < 3; c++) {
 								s = dst.at <cv::Vec3b>((oy + ny + out_y) % out_y, (ox + nx + out_x) % out_x)[c] - src.at<cv::Vec3b>((iy + ny + in_y) % in_y, (ix + nx + in_x) % in_x)[c];
 								ssd += (s * s);
@@ -72,7 +72,7 @@ void fullserch_L(cv::Mat src, cv::Mat dst, F_Property prop) {
 						}
 					}
 
-					// Å¬ SSD ’l‚Æ“ü—ÍƒeƒNƒXƒ`ƒƒ‚Ì‘I‘ğ‰æ‘f‚ÌXV
+					// æœ€å° SSD å€¤ã¨å…¥åŠ›ãƒ†ã‚¯ã‚¹ãƒãƒ£ã®é¸æŠç”»ç´ ã®æ›´æ–°
 					if (ssd_min > ssd) {
 						ssd_min = ssd;
 						ix_s = ix;
@@ -82,13 +82,13 @@ void fullserch_L(cv::Mat src, cv::Mat dst, F_Property prop) {
 				} // ix
 			} // iy
 
-			// o—ÍƒeƒNƒXƒ`ƒƒ‚Ì‰æ‘fF
-			if (ssd_min == ssd_max) {  // “ü—ÍƒeƒNƒXƒ`ƒƒ‚Ì‰æ‘f‚ª‘I‘ğ‚³‚ê‚Ä‚¢‚È‚¢
+			// å‡ºåŠ›ãƒ†ã‚¯ã‚¹ãƒãƒ£ã®ç”»ç´ è‰²
+			if (ssd_min == ssd_max) {  // å…¥åŠ›ãƒ†ã‚¯ã‚¹ãƒãƒ£ã®ç”»ç´ ãŒé¸æŠã•ã‚Œã¦ã„ãªã„
 				for (int c = 0; c < 3; c++) {
 					dst.at<cv::Vec3b>(oy, ox)[c] = 0;
 				}
 			}
-			else {                      // “ü—ÍƒeƒNƒXƒ`ƒƒ‚Ì‰æ‘f‚ª‘I‘ğ‚³‚ê‚Ä‚¢‚é
+			else {                      // å…¥åŠ›ãƒ†ã‚¯ã‚¹ãƒãƒ£ã®ç”»ç´ ãŒé¸æŠã•ã‚Œã¦ã„ã‚‹
 				for (int c = 0; c < 3; c++) {
 					dst.at<cv::Vec3b>(oy, ox)[c] = src.at<cv::Vec3b>(iy_s, ix_s)[c];
 				}

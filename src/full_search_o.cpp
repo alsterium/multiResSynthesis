@@ -1,6 +1,6 @@
 #include "full_search_o.h"
 
-std::pair<cv::Vec3b, int> full_search_o_select(cv::Mat ref_src, cv::Mat ref_dst, cv::Vec2i coord, F_Property prop)
+std::pair<cv::Vec3b, int> full_search_o_select(cv::Mat &ref_src, cv::Mat &ref_dst, cv::Point2i coord, F_Property prop)
 {
 	int nbr = prop.nbr;
 	int src_cyc = prop.cyc;
@@ -11,11 +11,11 @@ std::pair<cv::Vec3b, int> full_search_o_select(cv::Mat ref_src, cv::Mat ref_dst,
 	int dst_x = ref_dst.cols;
 	int dst_y = ref_dst.rows;
 
-	//“ü—ÍƒeƒNƒXƒ`ƒƒ‚Ì’Tõ”ÍˆÍ
+	//å…¥åŠ›ãƒ†ã‚¯ã‚¹ãƒãƒ£ã®æ¢ç´¢ç¯„å›²
 	int src_x_min, src_x_max;
 	int src_y_min, src_y_max;
 
-	//ŠÂó‚Å‚È‚¢
+	//ç’°çŠ¶ã§ãªã„
 	if (src_cyc == 0) {
 		src_x_min = nbr;
 		src_x_max = src_x - nbr;
@@ -30,58 +30,58 @@ std::pair<cv::Vec3b, int> full_search_o_select(cv::Mat ref_src, cv::Mat ref_dst,
 		src_y_max = src_y;
 	}
 
-	// ‹ß—×‰æ‘f’†‚Ì‰æ‘f”
-	int pxn = ((2 * nbr + 1) * (2 * nbr + 1)) / 2;
+	// è¿‘éš£ç”»ç´ ä¸­ã®ç”»ç´ æ•°
+	int pxn = ((2 * nbr + 1) * (2 * nbr + 1));
 	
-	// Å‘åSSD’l
+	// æœ€å¤§SSDå€¤
 	int ssd_max = 3 * 255 * 255 * pxn;
 
-	// Å¬SSD’l‚Ì‰Šú‰»
+	// æœ€å°SSDå€¤ã®åˆæœŸåŒ–
 	int ssd_min = ssd_max;
 
-	// “ü—ÍƒeƒNƒXƒ`ƒƒ‚Ì‘I‘ğ‰æ‘f‚Ì‰Šú‰»
-	int d_x_s = -1;
-	int d_y_s = -1;
+	// å…¥åŠ›ãƒ†ã‚¯ã‚¹ãƒãƒ£ã®é¸æŠç”»ç´ ã®åˆæœŸåŒ–
+	int s_x_s = -1;
+	int s_y_s = -1;
 
-	// “ü—ÍƒeƒNƒXƒ`ƒƒã‚Ì’Tõ
+	// å…¥åŠ›ãƒ†ã‚¯ã‚¹ãƒãƒ£ä¸Šã®æ¢ç´¢
 	for (int s_y = src_y_min; s_y < src_y_max; s_y++) {
 		for (int s_x = src_x_min; s_x < src_x_max; s_x++) {
-			// ‹ß—×‰æ‘fŒQ‚ÌSSD’l‚ÌŒvZ
+			// è¿‘éš£ç”»ç´ ç¾¤ã®SSDå€¤ã®è¨ˆç®—
 			int s;
 			int ssd = 0;
 
 			for (int ny = (-nbr); ny <= nbr; ny++) {
 				for (int nx = (-nbr); nx <= nbr; nx++) {
-					// ŒvZ
+					// è¨ˆç®—
 					for (int c = 0; c < 3; c++) {
-						s = ref_dst.at<cv::Vec3b>((coord.val[1] + ny + dst_y) % dst_y, (coord.val[0] + nx + dst_x) % dst_x)[c] - ref_src.at<cv::Vec3b>((s_y + ny + src_y) % src_y,(s_x + ny + src_x)%src_x)[c];
+						s = ref_dst.at<cv::Vec3b>((coord.y + ny + dst_y) % dst_y, (coord.x + nx + dst_x) % dst_x)[c] - ref_src.at<cv::Vec3b>((s_y + ny + src_y) % src_y,(s_x + ny + src_x)%src_x)[c];
 						ssd += (s * s);
 					}
 				}
 			}
-			// Å¬SSD’l‚Æ“ü—ÍƒeƒNƒXƒ`ƒƒ‚Ì‘I‘ğ‰æ‘f‚ÌXV
+			// æœ€å°SSDå€¤ã¨å…¥åŠ›ãƒ†ã‚¯ã‚¹ãƒãƒ£ã®é¸æŠç”»ç´ ã®æ›´æ–°
 			if (ssd_min > ssd) {
 				ssd_min = ssd;
-				d_x_s = s_x;
-				d_y_s = s_y;
+				s_x_s = s_x;
+				s_y_s = s_y;
 			}
 
 		}//s_x
 	}//s_y
 
-	// o—ÍƒeƒNƒXƒ`ƒƒ‚Ì‰æ‘fF
-	if (ssd_min == ssd_max) {//“ü—ÍƒeƒNƒXƒ`ƒƒ‚Ì‰æ‘f‚ª‘I‘ğ‚³‚ê‚Ä‚¢‚È‚¢
+	// å‡ºåŠ›ãƒ†ã‚¯ã‚¹ãƒãƒ£ã®ç”»ç´ è‰²
+	if (ssd_min == ssd_max) {//å…¥åŠ›ãƒ†ã‚¯ã‚¹ãƒãƒ£ã®ç”»ç´ ãŒé¸æŠã•ã‚Œã¦ã„ãªã„
 		return {cv::Vec3b(0, 0, 0), ssd_min};
 	}
-	else {//“ü—ÍƒeƒNƒXƒ`ƒƒ‚Ì‰æ‘f‚ª‘I‘ğ‚³‚ê‚Ä‚¢‚é
+	else {//å…¥åŠ›ãƒ†ã‚¯ã‚¹ãƒãƒ£ã®ç”»ç´ ãŒé¸æŠã•ã‚Œã¦ã„ã‚‹
 		return {
-			cv::Vec3b(ref_src.at<cv::Vec3b>(d_y_s, d_x_s)[0], ref_src.at<cv::Vec3b>(d_y_s, d_x_s)[1], ref_src.at<cv::Vec3b>(d_y_s, d_x_s)[2]),
-			ssd_min
+			cv::Vec3b(ref_src.at<cv::Vec3b>(s_y_s, s_x_s)[0], ref_src.at<cv::Vec3b>(s_y_s, s_x_s)[1], ref_src.at<cv::Vec3b>(s_y_s, s_x_s)[2]),
+			ssd_min/pxn
 		};
 	}
 }
 
-std::pair<cv::Vec3b, int> full_search_l_select(cv::Mat ref_src, cv::Mat ref_dst, cv::Vec2i coord, F_Property prop)
+std::pair<cv::Vec3b, int> full_search_l_select(cv::Mat &ref_src, cv::Mat &ref_dst, cv::Point2i coord, F_Property prop)
 {
 	int nbr = prop.nbr;
 	int src_cyc = prop.cyc;
@@ -92,11 +92,14 @@ std::pair<cv::Vec3b, int> full_search_l_select(cv::Mat ref_src, cv::Mat ref_dst,
 	int dst_x = ref_dst.cols;
 	int dst_y = ref_dst.rows;
 
-	//“ü—ÍƒeƒNƒXƒ`ƒƒ‚Ì’Tõ”ÍˆÍ
+	int d_x = coord.x;
+	int d_y = coord.y;
+
+	//å…¥åŠ›ãƒ†ã‚¯ã‚¹ãƒãƒ£ã®æ¢ç´¢ç¯„å›²
 	int src_x_min, src_x_max;
 	int src_y_min, src_y_max;
 
-	//ŠÂó‚Å‚È‚¢
+	//ç’°çŠ¶ã§ãªã„
 	if (src_cyc == 0) {
 		src_x_min = nbr;
 		src_x_max = src_x - nbr;
@@ -111,66 +114,72 @@ std::pair<cv::Vec3b, int> full_search_l_select(cv::Mat ref_src, cv::Mat ref_dst,
 		src_y_max = src_y;
 	}
 
-	// ‹ß—×‰æ‘f’†‚Ì‰æ‘f”
+	// è¿‘éš£ç”»ç´ ä¸­ã®ç”»ç´ æ•°
 	int pxn = ((2 * nbr + 1) * (2 * nbr + 1)) / 2;
 
-	// Å‘åSSD’l
+	// æœ€å¤§SSDå€¤
 	int ssd_max = 3 * 255 * 255 * pxn;
 
-	// Å¬SSD’l‚Ì‰Šú‰»
+
+	//-----å‡ºåŠ›ãƒ†ã‚¯ã‚¹ãƒãƒ£ã®ãƒ«ãƒ¼ãƒ—-----//
+
+	// æœ€å°SSDå€¤ã®åˆæœŸåŒ–
 	int ssd_min = ssd_max;
 
-	// “ü—ÍƒeƒNƒXƒ`ƒƒ‚Ì‘I‘ğ‰æ‘f‚Ì‰Šú‰»
-	int d_x_s = -1;
-	int d_y_s = -1;
+	// å…¥åŠ›ãƒ†ã‚¯ã‚¹ãƒãƒ£ã®é¸æŠç”»ç´ ã®åˆæœŸåŒ–
+	int s_x_s = -1;
+	int s_y_s = -1;
 
-	// “ü—ÍƒeƒNƒXƒ`ƒƒã‚Ì’Tõ
+	// å…¥åŠ›ãƒ†ã‚¯ã‚¹ãƒãƒ£ä¸Šã®æ¢ç´¢
 	for (int s_y = src_y_min; s_y < src_y_max; s_y++) {
 		for (int s_x = src_x_min; s_x < src_x_max; s_x++) {
-			// ‹ß—×‰æ‘fŒQ‚ÌSSD’l‚ÌŒvZ
+			// è¿‘éš£ç”»ç´ ç¾¤ã®SSDå€¤ã®è¨ˆç®—
 			int s;
 			int ssd = 0;
 
 			for (int ny = (-nbr); ny <= 0; ny++) {
 				for (int nx = (-nbr); nx <= nbr; nx++) {
 					if ((ny == 0) && (nx == 0))break;
-					// ŒvZ
+					// è¨ˆç®—
 					for (int c = 0; c < 3; c++) {
-						s = ref_dst.at<cv::Vec3b>((coord.val[1] + ny + dst_y) % dst_y, (coord.val[0] + nx + dst_x) % dst_x)[c] - ref_src.at<cv::Vec3b>((s_y + ny + src_y) % src_y, (s_x + ny + src_x) % src_x)[c];
+						s = ref_dst.at <cv::Vec3b>((d_y + ny + dst_y) % dst_y, (d_x + nx + dst_x) % dst_x)[c] - ref_src.at<cv::Vec3b>((s_y + ny + src_y) % src_y, (s_x + nx + src_x) % src_x)[c];
 						ssd += (s * s);
 					}
 				}
 			}
-			// Å¬SSD’l‚Æ“ü—ÍƒeƒNƒXƒ`ƒƒ‚Ì‘I‘ğ‰æ‘f‚ÌXV
+			// æœ€å°SSDå€¤ã¨å…¥åŠ›ãƒ†ã‚¯ã‚¹ãƒãƒ£ã®é¸æŠç”»ç´ ã®æ›´æ–°
 			if (ssd_min > ssd) {
 				ssd_min = ssd;
-				d_x_s = s_x;
-				d_y_s = s_y;
+				s_x_s = s_x;
+				s_y_s = s_y;
 			}
 
 		}//s_x
 	}//s_y
 
-	// o—ÍƒeƒNƒXƒ`ƒƒ‚Ì‰æ‘fF
-	if (ssd_min == ssd_max) {//“ü—ÍƒeƒNƒXƒ`ƒƒ‚Ì‰æ‘f‚ª‘I‘ğ‚³‚ê‚Ä‚¢‚È‚¢
+	// å‡ºåŠ›ãƒ†ã‚¯ã‚¹ãƒãƒ£ã®ç”»ç´ è‰²
+	if (ssd_min == ssd_max) {//å…¥åŠ›ãƒ†ã‚¯ã‚¹ãƒãƒ£ã®ç”»ç´ ãŒé¸æŠã•ã‚Œã¦ã„ãªã„
 		return { cv::Vec3b(0, 0, 0), ssd_max };
 	}
-	else {//“ü—ÍƒeƒNƒXƒ`ƒƒ‚Ì‰æ‘f‚ª‘I‘ğ‚³‚ê‚Ä‚¢‚é
+	else {//å…¥åŠ›ãƒ†ã‚¯ã‚¹ãƒãƒ£ã®ç”»ç´ ãŒé¸æŠã•ã‚Œã¦ã„ã‚‹
 		return {
-			cv::Vec3b(ref_src.at<cv::Vec3b>(d_y_s, d_x_s)[0], ref_src.at<cv::Vec3b>(d_y_s, d_x_s)[1], ref_src.at<cv::Vec3b>(d_y_s, d_x_s)[2]),
-			ssd_min
+			cv::Vec3b(ref_src.at<cv::Vec3b>(s_y_s, s_x_s)[0], ref_src.at<cv::Vec3b>(s_y_s, s_x_s)[1], ref_src.at<cv::Vec3b>(s_y_s, s_x_s)[2]),
+			ssd_min/pxn
 		};
 	}
 }
 
-void synthesis_multi(std::vector<cv::Mat> src_image_vector, std::vector<cv::Mat> dst_image_vector, F_Property prop)
+void synthesis_multi(std::vector<cv::Mat> &src_image_vector, std::vector<cv::Mat> &dst_image_vector, F_Property prop)
 {
-	// Å’á‰ğ‘œ“x‚Ì‰æ‘œ‡¬
+	// æœ€ä½è§£åƒåº¦ã®ç”»åƒåˆæˆ
 	std::cout << "--->lowest resolution image synthesis is running...\n";
 
-	for (int d_y = 0; d_y < dst_image_vector[dst_image_vector.size() - 1].rows; d_y++) {
-		for (int d_x = 0; d_x < dst_image_vector[dst_image_vector.size() - 1].cols; d_x++) {
-			auto [color, ssd_min] = full_search_l_select(src_image_vector[(int)(src_image_vector.size() - 1)], dst_image_vector[(int)(dst_image_vector.size() - 1)], cv::Vec2i(d_x, d_y), prop);
+	int low_level_dst_x = dst_image_vector[dst_image_vector.size() - 1].cols;
+	int low_level_dst_y = dst_image_vector[dst_image_vector.size() - 1].rows;
+
+	for (int d_y = 0; d_y < low_level_dst_y; d_y++) {
+		for (int d_x = 0; d_x < low_level_dst_x; d_x++) {
+			auto [color, ssd_min] = full_search_l_select(src_image_vector[(int)(src_image_vector.size() - 1)], dst_image_vector[(int)(dst_image_vector.size() - 1)], cv::Point2i(d_x, d_y), prop);
 			dst_image_vector[dst_image_vector.size() - 1].at<cv::Vec3b>(d_y, d_x) = color;
 		}
 	}
@@ -181,18 +190,22 @@ void synthesis_multi(std::vector<cv::Mat> src_image_vector, std::vector<cv::Mat>
 
 		int dst_x = dst_image_vector[i].cols;
 		int dst_y = dst_image_vector[i].rows;
-
-		//o—ÍƒeƒNƒXƒ`ƒƒ‚Ìƒ‹[ƒv
+		//fix
+		//å‡ºåŠ›ãƒ†ã‚¯ã‚¹ãƒãƒ£ã®ãƒ«ãƒ¼ãƒ—
+		std::cout << "-->Depth "<<i<<" is begginig... \n";
 		for (int d_y = 0; d_y < dst_y; d_y++) {
 			for (int d_x = 0; d_x < dst_x; d_x++) {
-				auto [o_color, o_ssd_min] = full_search_o_select(src_image_vector[(i + 1)], dst_image_vector[(i + 1)], cv::Vec2i((d_x / 2), (d_y / 2)), prop);
-				auto [l_color, l_ssd_min] = full_search_l_select(src_image_vector[i], dst_image_vector[i], cv::Vec2i(d_x, d_y), prop);
+				auto [o_color, o_ssd_min] = full_search_o_select(src_image_vector[(i + 1)], dst_image_vector[(i + 1)], cv::Point2i((d_x / 2), (d_y / 2)), prop);
+				auto [l_color, l_ssd_min] = full_search_l_select(src_image_vector[i], dst_image_vector[i], cv::Point2i(d_x, d_y), prop);
 				if (o_ssd_min > l_ssd_min)
 					dst_image_vector[i].at<cv::Vec3b>(d_y, d_x) = l_color;
 				else
 					dst_image_vector[i].at<cv::Vec3b>(d_y, d_x) = o_color;
 				//std::cout << "end in ( " << d_y << "," << d_x << " )...\n";
 			}
+				int e = ((float)d_y / (float)dst_y * 100);
+				std::cout << "progress... -> " << e << "%\r";
 		}
+		std::cout << "\n";
 	}
 }
