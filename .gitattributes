@@ -63,3 +63,8 @@
 #*.RTF   diff=astextplain
 
 /.gitignore merge=ours
+/.gitignore merge=ours
+/src/VS/multiResSynthesis.sln merge=ours
+/src/VS/multiResSynthesis.vcxproj merge=ours
+/src/VS/multiResSynthesis.vcxproj.filters merge=ours
+/src/VS/multiResSynthesis.vcxproj.user merge=ours
