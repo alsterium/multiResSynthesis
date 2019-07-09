@@ -2,3 +2,8 @@
 # この .gitignore ファイルは Microsoft(R) Visual Studio によって自動的に作成されました。
 ################################################################################
 /.vs
+/src/VS/.vs/multiResSynthesis/v16/ipch/AutoPCH/19594baab07294e1
+/src/VS/.vs/multiResSynthesis/v16/ipch/AutoPCH/3cf93c567b5835b
+/src/VS/.vs/multiResSynthesis/v16/ipch/AutoPCH/50b6e986c923cbff
+*.db
+*.opendb
