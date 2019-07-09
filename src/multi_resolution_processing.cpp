@@ -12,9 +12,9 @@ using namespace std;
 
 constexpr float scale = 0;
 
-constexpr int MultiResLevel = 2;
+constexpr int MultiResLevel = 4;
 // *square*
-constexpr int DstRes = 300;
+constexpr int DstRes = 200;
 
 int main() {
 	cout << "---->main()\n";
@@ -56,7 +56,7 @@ int main() {
 
 	//最低解像度の画像合成
 	//cout << "--->lowest resolution image synthesis is running...\n";
-	F_Property prop(3);
+	F_Property prop(2);
 	//fullserch_L(src_img_vector[(int)(src_img_vector.size() - 1)], dst_img_vector[(int)(dst_img_vector.size() - 1)], prop);
 
 	//各解像度ごとに一つ下のレベルの解像度を参照して画像合成
@@ -66,7 +66,7 @@ int main() {
 	//合成結果を表示
 	
 	cout << "<---end synthesis process.\n";
-	for (int i = 0; i < src_img_vector.size(); i++) {
+	/*for (int i = 0; i < src_img_vector.size(); i++) {
 		cv::String windowName = "src_image";
 		try { 
 			cv::imshow(windowName + to_string(i), src_img_vector[i]);
@@ -74,20 +74,17 @@ int main() {
 		catch (cv::Exception& e) {
 			cerr << e.what() << endl;
 		}
-	}
+	}*/
 
-	int i = 0;
-	for (auto &e : dst_img_vector) {
+	for (int i = 0; i < dst_img_vector.size(); i++) {
 		cv::String windowName = "result";
 		try {
-			cv::imshow(windowName + to_string(i), e);
+			cv::imshow(windowName + to_string(i), dst_img_vector[i]);
 		}
 		catch(cv::Exception& e){
 			cerr << e.what() << endl;
 			exit(1);
 		}
-		
-		i++;
 	}
 
 	cout << "<----end main()\n";
