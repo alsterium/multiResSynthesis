@@ -190,8 +190,9 @@ void synthesis_multi(std::vector<cv::Mat> &src_image_vector, std::vector<cv::Mat
 
 		int dst_x = dst_image_vector[i].cols;
 		int dst_y = dst_image_vector[i].rows;
-
+		//fix
 		//出力テクスチャのループ
+		std::cout << "-->Depth "<<i<<" is begginig... \n";
 		for (int d_y = 0; d_y < dst_y; d_y++) {
 			for (int d_x = 0; d_x < dst_x; d_x++) {
 				auto [o_color, o_ssd_min] = full_search_o_select(src_image_vector[(i + 1)], dst_image_vector[(i + 1)], cv::Point2i((d_x / 2), (d_y / 2)), prop);
@@ -200,8 +201,11 @@ void synthesis_multi(std::vector<cv::Mat> &src_image_vector, std::vector<cv::Mat
 					dst_image_vector[i].at<cv::Vec3b>(d_y, d_x) = l_color;
 				else
 					dst_image_vector[i].at<cv::Vec3b>(d_y, d_x) = o_color;
-				std::cout << "end in ( " << d_y << "," << d_x << " )...\n";
+				//std::cout << "end in ( " << d_y << "," << d_x << " )...\n";
 			}
+				int e = ((float)d_y / (float)dst_y * 100);
+				std::cout << "progress... -> " << e << "%\r";
 		}
+		std::cout << "\n";
 	}
 }
