@@ -57,7 +57,7 @@ int main() {
 	//最低解像度の画像合成
 	//cout << "--->lowest resolution image synthesis is running...\n";
 	F_Property prop(3);
-	fullserch_L(src_img_vector[(int)(src_img_vector.size() - 1)], dst_img_vector[(int)(dst_img_vector.size() - 1)], prop);
+	//fullserch_L(src_img_vector[(int)(src_img_vector.size() - 1)], dst_img_vector[(int)(dst_img_vector.size() - 1)], prop);
 
 	//各解像度ごとに一つ下のレベルの解像度を参照して画像合成
 	cout << "--->multi resolution synthesis is begin!!\n";

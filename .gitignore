@@ -7,3 +7,5 @@
 /src/VS/.vs/multiResSynthesis/v16/ipch/AutoPCH/50b6e986c923cbff
 *.db
 *.opendb
+/src/VS/.vs/multiResSynthesis/v16
+/src/VS/x64
