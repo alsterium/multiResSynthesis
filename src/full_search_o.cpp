@@ -190,7 +190,7 @@ void synthesis_multi(std::vector<cv::Mat> &src_image_vector, std::vector<cv::Mat
 
 		int dst_x = dst_image_vector[i].cols;
 		int dst_y = dst_image_vector[i].rows;
-
+		//fix
 		//出力テクスチャのループ
 		for (int d_y = 0; d_y < dst_y; d_y++) {
 			for (int d_x = 0; d_x < dst_x; d_x++) {
