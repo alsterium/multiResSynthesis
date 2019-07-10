@@ -4,5 +4,8 @@
 /.vs
 *.db
 *.opendb
-/src/VS/
 
+
+/src/VS/.vs/multiResSynthesis/v16
+/src/VS/x64
+/src/VS/result
