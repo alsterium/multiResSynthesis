@@ -182,9 +182,11 @@ void synthesis_multi(std::vector<cv::Mat> &src_image_vector, std::vector<cv::Mat
 			auto [color, ssd_min] = full_search_l_select(src_image_vector[(int)(src_image_vector.size() - 1)], dst_image_vector[(int)(dst_image_vector.size() - 1)], cv::Point2i(d_x, d_y), prop);
 			dst_image_vector[dst_image_vector.size() - 1].at<cv::Vec3b>(d_y, d_x) = color;
 		}
+		int e = ((float)d_y / (float)low_level_dst_y * 100);
+		std::cout << "progress... -> " << e << "%\r";
 	}
 
-	std::cout << "-->Recursive image synthesis is running...\n";
+	std::cout << "\n-->Recursive image synthesis is running...\n";
 
 	for (int i = dst_image_vector.size() - 2; i >= 0; i--) {
 
