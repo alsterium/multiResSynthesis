@@ -3,6 +3,7 @@
 //#include "pch.h"
 #include <vector>
 #include <iostream>
+#include <atltime.h>
 #include <opencv2\opencv.hpp>
 #include "property.h"
 #include "full_serch_l.h"
@@ -10,32 +11,40 @@
 
 using namespace std;
 
-constexpr float scale = 0;
-
-constexpr int MultiResLevel = 4;
+//constexpr int MultiResLevel = 4;
 // *square*
-constexpr int DstRes = 200;
+//constexpr int DstRes = 200;
 
-int main() {
+int main(int argc, char* argv[]) {
 	cout << "---->main()\n";
-	cout << "";
+
+	if (argc != 5) {
+		cout << "usage: [file] [MultiResLevel] [DstRes] [Nbr]";
+		exit(-1);
+	}
+
+	int MultiResLevel = atoi(argv[2]);
+	int DstRes = atoi(argv[3]);
+	int Nbr = atoi(argv[4]);
+	cv::String filepath = argv[1];
+
 	cv::Mat src_image;
-	src_image = cv::imread("./texture_o_icon.jpg");
+	src_image = cv::imread(filepath);
 	vector<cv::Mat> src_img_vector;
 	vector<cv::Mat> dst_img_vector;
 
 	//出力先のMattを生成
-	cout << "--->Create dst Mat vector.";
+	//cout << "--->Create dst Mat vector.";
 	dst_img_vector.push_back(cv::Mat(cv::Size(DstRes,DstRes),CV_8UC3));
 	cv::Mat tmp = dst_img_vector[0];
-	cout << "-->execute pyrDown.";
+	//cout << "-->execute pyrDown.";
 	for (int i = 1; i < MultiResLevel; i++){
 		cv::pyrDown(tmp, tmp);
 		dst_img_vector.push_back(tmp);
 	}
 
 	//解像度を1/2した画像を生成
-	cout << "-->Generate harf-size image.";
+	//cout << "-->Generate harf-size image.";
 	src_img_vector.push_back(src_image);
 	try {
 		tmp = src_image;
@@ -46,23 +55,29 @@ int main() {
 	}
 	catch(cv::Exception& e){
 		cerr << e.what() << endl;
-		exit(1);
+		exit(-2);
 	}
 	
 
 	//出力先の画像をランダムな値で初期化
-	cout << "-->initialize each image.\n";
+	//cout << "-->initialize each image.\n";
 	for (auto &e : dst_img_vector) { cv::randu(e, cv::Scalar(0, 0, 0), cv::Scalar(256, 256, 256));}
 
-	//最低解像度の画像合成
-	//cout << "--->lowest resolution image synthesis is running...\n";
-	F_Property prop(2);
-	//fullserch_L(src_img_vector[(int)(src_img_vector.size() - 1)], dst_img_vector[(int)(dst_img_vector.size() - 1)], prop);
-
 	//各解像度ごとに一つ下のレベルの解像度を参照して画像合成
+
+	F_Property prop(Nbr);
 	cout << "--->multi resolution synthesis is begin!!\n";
+	//時間計測スタート
+	CFileTime cTimeStart, cTimeEnd;
+	CFileTimeSpan cTimeSpan;
+	cTimeStart = CFileTime::GetTickCount();
+
 	synthesis_multi(src_img_vector, dst_img_vector, prop);
 
+	//時間計測ストップ
+	cTimeEnd = CFileTime::GetTickCount();
+	cTimeSpan = cTimeEnd - cTimeStart;
+	cout << "Processing Time: " << cTimeSpan.GetTimeSpan()/10000000.0<<"[sec]\n";
 	//合成結果を表示
 	
 	cout << "<---end synthesis process.\n";
@@ -76,16 +91,24 @@ int main() {
 		}
 	}*/
 
+	CTime time = CTime::GetTickCount();
+	cv::String time_s = time.Format("%Y%m%d_%H%M%S");
 	for (int i = 0; i < dst_img_vector.size(); i++) {
 		cv::String windowName = "result";
+		cv::String filename = "[MR-"+to_string(MultiResLevel) + "][DR-"+to_string(DstRes)+"][Nb-"+to_string(Nbr)+"][Dpth-"+to_string(i)+"]_"+time_s+".png";
+
 		try {
-			cv::imshow(windowName + to_string(i), dst_img_vector[i]);
+			//cv::imshow(windowName + to_string(i), dst_img_vector[i]);
+			cv::imwrite("./result/"+filename, dst_img_vector[i]);
+			
 		}
 		catch(cv::Exception& e){
 			cerr << e.what() << endl;
-			exit(1);
+			exit(-3);
 		}
 	}
+	cv::FileStorage outYml("./result/result.yml", cv::FileStorage::APPEND);
+	outYml << "SynthesisDate" << time_s << "InputFile" << filepath << "MultiResLevel" << MultiResLevel << "DstSize" << DstRes << "Nbr" << Nbr << "ProcessTime" << cTimeSpan.GetTimeSpan() / 10000000.0;
 
 	cout << "<----end main()\n";
 	cv::waitKey(0);
