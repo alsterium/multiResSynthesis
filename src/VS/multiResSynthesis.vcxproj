@@ -119,7 +119,6 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="..\full_search_o.cpp" />
-    <ClCompile Include="..\full_serch_l.cpp" />
     <ClCompile Include="..\multi_resolution_processing.cpp" />
   </ItemGroup>
   <ItemGroup>

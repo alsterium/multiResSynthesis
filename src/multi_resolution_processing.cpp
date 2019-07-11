@@ -6,7 +6,6 @@
 #include <atltime.h>
 #include <opencv2\opencv.hpp>
 #include "property.h"
-#include "full_serch_l.h"
 #include "full_search_o.h"
 
 using namespace std;

@@ -18,9 +18,6 @@
     <ClCompile Include="..\full_search_o.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\full_serch_l.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="..\multi_resolution_processing.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
